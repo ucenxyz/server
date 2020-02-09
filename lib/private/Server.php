@@ -672,7 +672,7 @@ class Server extends ServerContainer implements IServerContainer {
 		$this->registerAlias(\OCP\Support\Subscription\IRegistry::class, \OC\Support\Subscription\Registry::class);
 
 		$this->registerService(\OC\Log::class, function (Server $c) {
-			$logType = $c->query('AllConfig')->getSystemValue('log_type', 'file');
+			$logType = $c->query(AllConfig::class)->getSystemValue('log_type', 'file');
 			$factory = new LogFactory($c, $this->getSystemConfig());
 			$logger = $factory->get($logType);
 			$registry = $c->query(\OCP\Support\CrashReport\IRegistry::class);
@@ -1576,14 +1576,14 @@ class Server extends ServerContainer implements IServerContainer {
 	 * @return \OCP\IConfig
 	 */
 	public function getConfig() {
-		return $this->query('AllConfig');
+		return $this->query(AllConfig::class);
 	}
 
 	/**
 	 * @return \OC\SystemConfig
 	 */
 	public function getSystemConfig() {
-		return $this->query('SystemConfig');
+		return $this->query(SystemConfig::class);
 	}
 
 	/**
