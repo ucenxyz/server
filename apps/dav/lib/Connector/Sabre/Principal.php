@@ -245,12 +245,13 @@ class Principal implements BackendInterface {
 			return [];
 		}
 
-		$allowEnumeration = $this->config->getAppValue('core', 'shareapi_allow_share_dialog_user_enumeration', 'yes') === 'yes';
+		$allowEnumeration = $this->shareManager->allowEnumeration();
+		$limitEnumeration = $this->shareManager->limitEnumerationToGroups();
 
 		// If sharing is restricted to group members only,
 		// return only members that have groups in common
 		$restrictGroups = false;
-		if ($this->shareManager->shareWithGroupMembersOnly()) {
+		if ($this->shareManager->shareWithGroupMembersOnly() || $limitEnumeration) {
 			$user = $this->userSession->getUser();
 			if (!$user) {
 				return [];
@@ -259,14 +260,31 @@ class Principal implements BackendInterface {
 			$restrictGroups = $this->groupManager->getUserGroupIds($user);
 		}
 
+		$currentUserGroups = [];
+		if ($limitEnumeration) {
+			$currentUser = $this->userSession->getUser();
+			if ($currentUser) {
+				$currentUserGroups = $this->groupManager->getUserGroupIds($currentUser);
+			}
+		}
+
 		foreach ($searchProperties as $prop => $value) {
 			switch ($prop) {
 				case '{http://sabredav.org/ns}email-address':
 					$users = $this->userManager->getByEmail($value);
 
-					if (!$allowEnumeration) {
+					if (!$allowEnumeration || $limitEnumeration) {
 						$users = \array_filter($users, static function(IUser $user) use ($value) {
 							return $user->getEMailAddress() === $value;
+						});
+					}
+
+					if ($limitEnumeration) {
+						$users = \array_filter($users, static function (IUser $user) use ($currentUserGroups) {
+							return !empty(array_intersect(
+								$this->groupManager->getUserGroupIds($user),
+								$currentUserGroups
+							));
 						});
 					}
 
@@ -287,9 +305,18 @@ class Principal implements BackendInterface {
 				case '{DAV:}displayname':
 					$users = $this->userManager->searchDisplayName($value);
 
-					if (!$allowEnumeration) {
+					if (!$allowEnumeration || $limitEnumeration) {
 						$users = \array_filter($users, static function(IUser $user) use ($value) {
 							return $user->getDisplayName() === $value;
+						});
+					}
+
+					if ($limitEnumeration) {
+						$users = \array_filter($users, static function (IUser $user) use ($currentUserGroups) {
+							return !empty(array_intersect(
+								$this->groupManager->getUserGroupIds($user),
+								$currentUserGroups
+							));
 						});
 					}
 
