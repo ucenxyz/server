@@ -91,6 +91,10 @@ div[contenteditable=true],
 		color: var(--color-primary-text);
 		cursor: pointer;
 
+		* {
+			cursor: pointer;
+		}
+
 		/* Apply border to primary button if on log in page (and not in a dark container) or if in header */
 		#body-login :not(.body-login-container) &,
 		#header & {
@@ -113,6 +117,10 @@ div[contenteditable=true],
 			background-color: var(--color-primary-element);
 			color: var(--color-primary-text-dark);
 			cursor: default;
+
+			* {
+				cursor: default;
+			}
 		}
 	}
 }
