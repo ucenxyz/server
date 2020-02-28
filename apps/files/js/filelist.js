@@ -99,6 +99,11 @@
 		shown: false,
 
 		/**
+		 * @type boolean
+		 */
+		_setDefaultActionsEnabled: true,
+
+		/**
 		 * Number of files per page
 		 * Always show a minimum of 1
 		 *
@@ -876,7 +881,7 @@
 				if (!this._detailsView || $(event.target).is('.nametext, .name, .thumbnail') || $(event.target).closest('.nametext').length) {
 					var filename = $tr.attr('data-file');
 					var renaming = $tr.data('renaming');
-					if (!renaming) {
+					if (!renaming && !this.setDefaultActionsEnabled) {
 						this.fileActions.currentFile = $tr.find('td');
 						var mime = this.fileActions.getCurrentMimeType();
 						var type = this.fileActions.getCurrentType();
@@ -917,6 +922,13 @@
 					}
 				}
 			}
+		},
+
+		/**
+		 * Event handler when default action is enabled
+		 */
+		setDefaultActionsEnabled: function(enabled) {
+			this._setDefaultActionsEnabled = enabled
 		},
 
 		/**
