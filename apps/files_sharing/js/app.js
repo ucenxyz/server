@@ -112,6 +112,7 @@ OCA.Sharing.App = {
 			{
 				id: 'shares.deleted',
 				showDeleted: true,
+				setDefaultActionsEnabled: false,
 				sharedWithUser: true,
 				fileActions: this._restoreShareAction(),
 				config: OCA.Files.App.getFilesConfig(),
